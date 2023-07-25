@@ -284,6 +284,8 @@ require (
 	k8s.io/klog/v2 v2.90.1 // @grafana/grafana-app-platform-squad
 )
 
+require github.com/oklog/ulid/v2 v2.1.0
+
 require (
 	cloud.google.com/go v0.110.6 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
