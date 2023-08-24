@@ -3,6 +3,7 @@ package eval_mocks
 import (
 	"errors"
 
+	"github.com/grafana/grafana/pkg/expr"
 	"github.com/grafana/grafana/pkg/services/ngalert/eval"
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
 )
@@ -27,6 +28,6 @@ func (f fakeEvaluatorFactory) Validate(ctx eval.EvaluationContext, condition mod
 	return f.err
 }
 
-func (f fakeEvaluatorFactory) Create(ctx eval.EvaluationContext, condition models.Condition) (eval.ConditionEvaluator, error) {
+func (f fakeEvaluatorFactory) Create(ctx eval.EvaluationContext, condition models.Condition, r expr.LoadedMetricsReader) (eval.ConditionEvaluator, error) {
 	return f.evaluator, f.err
 }

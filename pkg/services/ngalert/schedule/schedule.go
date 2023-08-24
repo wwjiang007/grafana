@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"go.opentelemetry.io/otel/attribute"
 	"golang.org/x/sync/errgroup"
 
@@ -377,7 +378,10 @@ func (sch *schedule) ruleRoutine(grafanaCtx context.Context, key ngmodels.AlertR
 		start := sch.clock.Now()
 
 		evalCtx := eval.NewContext(ctx, SchedulerUserFor(e.rule.OrgID))
-		ruleEval, err := sch.evaluatorFactory.Create(evalCtx, e.rule.GetEvalCondition())
+		ruleEval, err := sch.evaluatorFactory.Create(evalCtx, e.rule.GetEvalCondition(), &LoadedMetricsFromState{
+			Manager: sch.stateManager,
+			Rule:    e.rule,
+		})
 		var results eval.Results
 		var dur time.Duration
 		if err != nil {
@@ -585,4 +589,28 @@ func SchedulerUserFor(orgID int64) *user.SignedInUser {
 			},
 		},
 	}
+}
+
+type RuleStateReader interface {
+	GetStatesForRuleUID(orgID int64, alertRuleUID string) []*state.State
+}
+
+type LoadedMetricsFromState struct {
+	Manager RuleStateReader
+	Rule    *ngmodels.AlertRule
+}
+
+func (n LoadedMetricsFromState) Read(_ context.Context) (map[data.Fingerprint]struct{}, error) {
+	states := n.Manager.GetStatesForRuleUID(n.Rule.OrgID, n.Rule.UID)
+
+	active := map[data.Fingerprint]struct{}{}
+	for _, st := range states {
+		if st.StateReason != "" {
+			continue
+		}
+		if st.State == eval.Alerting || st.State == eval.Pending {
+			active[st.ResultFingerprint] = struct{}{}
+		}
+	}
+	return active, nil
 }
