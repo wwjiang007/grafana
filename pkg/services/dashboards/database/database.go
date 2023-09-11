@@ -62,6 +62,8 @@ func ProvideDashboardStore(sqlStore db.DB, cfg *setting.Cfg, features featuremgm
 		return nil, err
 	}
 
+	s.DataMigration()
+
 	return s, nil
 }
 
@@ -688,6 +690,18 @@ func (d *dashboardStore) DeleteDashboard(ctx context.Context, cmd *dashboards.De
 	return d.store.WithTransactionalDbSession(ctx, func(sess *db.Session) error {
 		return d.deleteDashboard(cmd, sess, d.emitEntityEvent())
 	})
+}
+
+func (d *dashboardStore) DataMigration() {
+	if err := d.store.WithDbSession(context.Background(), func(sess *sqlstore.DBSession) error {
+		q := "UPDATE dashboard SET folder_uid = (SELECT uid FROM dashboard AS d WHERE d.id = dashboard.folder_id) WHERE folder_uid IS NULL"
+		r, err := sess.Exec(q)
+		rowsAffected, rowsAffectedErr := r.RowsAffected()
+		d.log.Debug("Migrating dashboard data", "rows", rowsAffected, "error", rowsAffectedErr)
+		return err
+	}); err != nil {
+		d.log.Error("Failed to migrate dashboard data", "error", err)
+	}
 }
 
 func (d *dashboardStore) deleteDashboard(cmd *dashboards.DeleteDashboardCommand, sess *db.Session, emitEntityEvent bool) error {
