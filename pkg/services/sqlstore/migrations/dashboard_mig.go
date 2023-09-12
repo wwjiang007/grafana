@@ -238,4 +238,12 @@ func addDashboardMigration(mg *Migrator) {
 	mg.AddMigration("Add folder_uid for dashboard", NewAddColumnMigration(dashboardV2, &Column{
 		Name: "folder_uid", Type: DB_NVarchar, Length: 40, Nullable: true,
 	}))
+
+	mg.AddMigration("Add unique index for dashboard_org_id_folder_uid_title", NewAddIndexMigration(dashboardV2, &Index{
+		Cols: []string{"org_id", "folder_uid", "title"}, Type: UniqueIndex,
+	}))
+
+	mg.AddMigration("Drop unique index for dashboard_org_id_title_folder_id", NewDropIndexMigration(dashboardV2, &Index{
+		Cols: []string{"org_id", "folder_id", "title"}, Type: UniqueIndex,
+	}))
 }
