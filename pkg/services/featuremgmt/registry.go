@@ -808,5 +808,11 @@ var (
 			RequiresDevMode: true,
 			Owner:           grafanaAuthnzSquad,
 		},
+		{
+			Name:        "panelTitleSearchInV1",
+			Description: "Enable searching for dashboards using panel title in search v1",
+			Stage:       FeatureStageExperimental,
+			Owner:       grafanaBackendPlatformSquad,
+		},
 	}
 )

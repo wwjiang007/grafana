@@ -470,4 +470,8 @@ const (
 	// FlagExternalServiceAccounts
 	// Automatic service account and token setup for plugins
 	FlagExternalServiceAccounts = "externalServiceAccounts"
+
+	// FlagPanelTitleSearchInV1
+	// Enable searching for dashboards using panel title in search v1
+	FlagPanelTitleSearchInV1 = "panelTitleSearchInV1"
 )
