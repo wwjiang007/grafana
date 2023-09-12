@@ -29,7 +29,7 @@ import {
   ApplyFieldOverrideOptions,
   StreamingDataFrame,
 } from '@grafana/data';
-import { getTemplateSrv, toDataQueryError } from '@grafana/runtime';
+import { getTemplateSrv, toDataQueryError, DataSourceWithBackend, config } from '@grafana/runtime';
 import { ExpressionDatasourceRef } from '@grafana/runtime/src/utils/DataSourceWithBackend';
 import { isStreamingDataFrame } from 'app/features/live/data/utils';
 import { getDatasourceSrv } from 'app/features/plugins/datasource_srv';
@@ -38,6 +38,7 @@ import { isSharedDashboardQuery, runSharedRequest } from '../../../plugins/datas
 import { PanelModel } from '../../dashboard/state';
 
 import { getDashboardQueryRunner } from './DashboardQueryRunner/DashboardQueryRunner';
+import { PublicDashboardDataSource } from './DashboardQueryRunner/PublicDashboardDataSource';
 import { mergePanelAndDashData } from './mergePanelAndDashData';
 import { runRequest } from './runRequest';
 
@@ -414,5 +415,10 @@ async function getDataSource(
     return datasource;
   }
 
-  return await getDatasourceSrv().get(datasource, scopedVars);
+  let ds = await getDatasourceSrv().get(datasource, scopedVars);
+  if (config.publicDashboardAccessToken && !(ds instanceof DataSourceWithBackend)) {
+    ds = new PublicDashboardDataSource(ds);
+  }
+
+  return ds;
 }
