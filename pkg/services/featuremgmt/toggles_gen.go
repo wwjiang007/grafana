@@ -446,4 +446,8 @@ const (
 	// FlagPluginsAPIMetrics
 	// Sends metrics of public grafana packages usage by plugins
 	FlagPluginsAPIMetrics = "pluginsAPIMetrics"
+
+	// FlagAlertingSaveStateAsync
+	// Writes the state only on a given interval to database
+	FlagAlertingSaveStateAsync = "alertingSaveStateAsync"
 )
