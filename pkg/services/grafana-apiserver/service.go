@@ -13,7 +13,6 @@ import (
 	grafanaapiserver "github.com/grafana/grafana-apiserver/pkg/apiserver"
 	"github.com/grafana/grafana-apiserver/pkg/certgenerator"
 	grafanaapiserveroptions "github.com/grafana/grafana-apiserver/pkg/cmd/server/options"
-	"github.com/grafana/grafana-apiserver/pkg/storage/filepath"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apiserver/pkg/authentication/authenticator"
 	"k8s.io/apiserver/pkg/authentication/request/headerrequest"
@@ -26,6 +25,8 @@ import (
 	"k8s.io/klog/v2"
 
 	"github.com/grafana/grafana/pkg/modules"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
+	"github.com/grafana/grafana/pkg/setting"
 )
 
 const (
@@ -50,14 +51,18 @@ type service struct {
 
 	restConfig *rest.Config
 
+	cfg       *setting.Cfg
+	features  featuremgmt.FeatureToggles
 	dataPath  string
 	stopCh    chan struct{}
 	stoppedCh chan error
 }
 
-func New(dataPath string) (*service, error) {
+func New(cfg *setting.Cfg, features featuremgmt.FeatureToggles) (*service, error) {
 	s := &service{
-		dataPath: dataPath,
+		cfg:      cfg,
+		features: features,
+		dataPath: path.Join(cfg.DataPath, "k8s"),
 		stopCh:   make(chan struct{}),
 	}
 
@@ -122,9 +127,9 @@ func (s *service) start(ctx context.Context) error {
 		return err
 	}
 
-	serverConfig.ExtraConfig.RESTOptionsGetter = filepath.NewRESTOptionsGetter(s.dataPath, unstructured.UnstructuredJSONScheme)
-	serverConfig.GenericConfig.RESTOptionsGetter = filepath.NewRESTOptionsGetter(s.dataPath, grafanaapiserver.Codecs.LegacyCodec(kindsv1.SchemeGroupVersion))
-	serverConfig.GenericConfig.Config.RESTOptionsGetter = filepath.NewRESTOptionsGetter(s.dataPath, grafanaapiserver.Codecs.LegacyCodec(kindsv1.SchemeGroupVersion))
+	serverConfig.ExtraConfig.RESTOptionsGetter = NewRESTOptionsGetter(s.cfg, s.features, unstructured.UnstructuredJSONScheme)
+	serverConfig.GenericConfig.RESTOptionsGetter = NewRESTOptionsGetter(s.cfg, s.features, grafanaapiserver.Codecs.LegacyCodec(kindsv1.SchemeGroupVersion))
+	serverConfig.GenericConfig.Config.RESTOptionsGetter = NewRESTOptionsGetter(s.cfg, s.features, grafanaapiserver.Codecs.LegacyCodec(kindsv1.SchemeGroupVersion))
 
 	authenticator, err := newAuthenticator(rootCert)
 	if err != nil {

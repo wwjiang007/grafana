@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"path"
 	"path/filepath"
 	"strconv"
 	"sync"
@@ -124,7 +123,7 @@ func (s *ModuleServer) Run() error {
 
 	if s.features.IsEnabled(featuremgmt.FlagGrafanaAPIServer) {
 		m.RegisterModule(modules.GrafanaAPIServer, func() (services.Service, error) {
-			return grafanaapiserver.New(path.Join(s.cfg.DataPath, "k8s"))
+			return grafanaapiserver.New(s.cfg, s.features)
 		})
 	} else {
 		s.log.Debug("apiserver feature is disabled")
