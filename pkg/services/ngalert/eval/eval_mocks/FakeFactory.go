@@ -28,6 +28,10 @@ func (f fakeEvaluatorFactory) Validate(ctx eval.EvaluationContext, condition mod
 	return f.err
 }
 
-func (f fakeEvaluatorFactory) Create(ctx eval.EvaluationContext, condition models.Condition, r expr.LoadedMetricsReader) (eval.ConditionEvaluator, error) {
+func (f fakeEvaluatorFactory) Create(ctx eval.EvaluationContext, condition models.Condition) (eval.ConditionEvaluator, error) {
+	return f.evaluator, f.err
+}
+
+func (f fakeEvaluatorFactory) CreateWithLoadedMetrics(ctx eval.EvaluationContext, condition models.Condition, r expr.LoadedMetricsReader) (eval.ConditionEvaluator, error) {
 	return f.evaluator, f.err
 }

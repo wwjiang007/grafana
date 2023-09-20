@@ -32,7 +32,9 @@ type EvaluatorFactory interface {
 	// Validate validates that the condition is correct. Returns nil if the condition is correct. Otherwise, error that describes the failure
 	Validate(ctx EvaluationContext, condition models.Condition) error
 	// Create builds an evaluator pipeline ready to evaluate a rule's query
-	Create(ctx EvaluationContext, condition models.Condition, r expr.LoadedMetricsReader) (ConditionEvaluator, error)
+	Create(ctx EvaluationContext, condition models.Condition) (ConditionEvaluator, error)
+	// CreateWithLoadedMetrics builds an evaluator pipeline ready to evaluate a rule's query
+	CreateWithLoadedMetrics(ctx EvaluationContext, condition models.Condition, r expr.LoadedMetricsReader) (ConditionEvaluator, error)
 }
 
 //go:generate mockery --name ConditionEvaluator --structname ConditionEvaluatorMock --with-expecter --output eval_mocks --outpkg eval_mocks
@@ -725,7 +727,11 @@ func (e *evaluatorImpl) Validate(ctx EvaluationContext, condition models.Conditi
 	return err
 }
 
-func (e *evaluatorImpl) Create(ctx EvaluationContext, condition models.Condition, r expr.LoadedMetricsReader) (ConditionEvaluator, error) {
+func (e *evaluatorImpl) Create(ctx EvaluationContext, condition models.Condition) (ConditionEvaluator, error) {
+	return e.CreateWithLoadedMetrics(ctx, condition, nil)
+}
+
+func (e *evaluatorImpl) CreateWithLoadedMetrics(ctx EvaluationContext, condition models.Condition, r expr.LoadedMetricsReader) (ConditionEvaluator, error) {
 	if len(condition.Data) == 0 {
 		return nil, errors.New("expression list is empty. must be at least 1 expression")
 	}

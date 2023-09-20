@@ -378,7 +378,7 @@ func (sch *schedule) ruleRoutine(grafanaCtx context.Context, key ngmodels.AlertR
 		start := sch.clock.Now()
 
 		evalCtx := eval.NewContext(ctx, SchedulerUserFor(e.rule.OrgID))
-		ruleEval, err := sch.evaluatorFactory.Create(evalCtx, e.rule.GetEvalCondition(), &LoadedMetricsFromState{
+		ruleEval, err := sch.evaluatorFactory.CreateWithLoadedMetrics(evalCtx, e.rule.GetEvalCondition(), &LoadedMetricsFromState{
 			Manager: sch.stateManager,
 			Rule:    e.rule,
 		})

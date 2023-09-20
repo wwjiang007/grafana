@@ -157,7 +157,7 @@ func newBacktestingEvaluator(ctx context.Context, evalFactory eval.EvaluatorFact
 		}
 	}
 
-	evaluator, err := evalFactory.Create(eval.EvaluationContext{Ctx: ctx,
+	evaluator, err := evalFactory.CreateWithLoadedMetrics(eval.EvaluationContext{Ctx: ctx,
 		User: user,
 	}, condition, reader)
 
