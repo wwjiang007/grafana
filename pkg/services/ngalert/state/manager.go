@@ -110,8 +110,10 @@ func (st *Manager) Run(ctx context.Context) error {
 		case <-ctx.Done():
 			st.log.Debug("Stopping")
 			ticker.Stop()
-			st.stateRunnerShutdown <- struct{}{}
-			st.stateRunnerWG.Wait()
+			if st.saveStateAsync {
+				st.stateRunnerShutdown <- struct{}{}
+				st.stateRunnerWG.Wait()
+			}
 			return ctx.Err()
 		}
 	}
