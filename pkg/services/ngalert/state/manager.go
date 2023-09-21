@@ -111,7 +111,7 @@ func (st *Manager) Run(ctx context.Context) error {
 			st.log.Debug("Stopping")
 			ticker.Stop()
 			if st.saveStateAsync {
-				st.stateRunnerShutdown <- struct{}{}
+				close(st.stateRunnerShutdown)
 				st.stateRunnerWG.Wait()
 			}
 			return ctx.Err()
