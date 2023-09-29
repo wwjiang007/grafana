@@ -1,7 +1,7 @@
 import { xor } from 'lodash';
 import { ValidateResult } from 'react-hook-form';
 
-import { DataFrame, ThresholdsConfig, ThresholdsMode, isTimeSeriesFrames, PanelData } from '@grafana/data';
+import { DataFrame, isTimeSeriesFrames, PanelData, ThresholdsConfig, ThresholdsMode } from '@grafana/data';
 import { GraphTresholdsStyleMode, LoadingState } from '@grafana/schema';
 import { config } from 'app/core/config';
 import { EvalFunction } from 'app/features/alerting/state/alertDef';
