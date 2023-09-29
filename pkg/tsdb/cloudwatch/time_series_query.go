@@ -59,6 +59,10 @@ func (e *cloudWatchExecutor) executeTimeSeriesQuery(ctx context.Context, logger 
 	for r, q := range requestQueriesByRegion {
 		requestQueries := q
 		region := r
+
+		// batch queries and call the goroutine for each one
+		_ = getMetricQueryBatches(requestQueries, logger)
+
 		eg.Go(func() error {
 			defer func() {
 				if err := recover(); err != nil {
@@ -123,4 +127,66 @@ func (e *cloudWatchExecutor) executeTimeSeriesQuery(ctx context.Context, logger 
 	}
 
 	return resp, nil
+}
+
+func getMetricQueryBatches(queries []*models.CloudWatchQuery, logger log.Logger) [][]*models.CloudWatchQuery {
+	metricInsightIndices := []int{}
+	mathIndices := []int{}
+	for i, query := range queries {
+		logger.Warn("iteratin", "id", query.Id)
+		switch query.GetGetMetricDataAPIMode() {
+		case models.GMDApiModeSQLExpression:
+			metricInsightIndices = append(metricInsightIndices, i)
+		case models.GMDApiModeMathExpression:
+			mathIndices = append(mathIndices, i)
+		}
+	}
+	logger.Warn("batchin", "insight queries", metricInsightIndices)
+	if len(metricInsightIndices) <= 1 {
+		return [][]*models.CloudWatchQuery{queries}
+	}
+
+	batches := [][]*models.CloudWatchQuery{}
+	idToIndex := map[string]*models.CloudWatchQuery{}
+	queryUsed := make([]int, len(queries))
+	for i, query := range queries {
+		queryUsed[i] = -1
+		if query.Id != "" {
+			idToIndex[query.Id] = query
+		}
+	}
+
+	// alternatively! figure out which queries use which other queries
+	// each query that doesn't get used by another gets a batch
+	// we build starting from there
+
+	// check for math queries and link them to their referenced queries
+	// this could be a chain
+	// do you have to have an id to be referenced in metric math?
+	// ...can a math expression be called in multiple math expressions...
+	for _, mathIndex := range mathIndices {
+		// if query hasn't been used
+		if queryUsed[mathIndex] < 0 {
+			// create a new batch for this index
+			newBatch := []*models.CloudWatchQuery{queries[mathIndex]}
+			queryUsed[mathIndex] = len(batches)
+			// add this new batch to the batches
+			batches = append(batches, newBatch)
+		}
+
+		// now we figure out how to parse labels from math expressions
+
+		// get any queries that were used and add them to the batch
+	}
+
+	// add the unused queries as individual batches
+	// (alerting was doing this before and it was fine, but check if there's a cost to this...)
+	for idx, used := range queryUsed {
+		if used >= 0 {
+			continue
+		}
+		batches = append(batches, []*models.CloudWatchQuery{queries[idx]})
+	}
+
+	return batches
 }
