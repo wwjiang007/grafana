@@ -6,6 +6,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
 import { FilterInput, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
+import { Trans } from 'app/core/internationalization';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { useDispatch } from 'app/types';
 
@@ -128,6 +129,8 @@ const BrowseDashboardsPage = memo(({ match }: Props) => {
           escapeRegex={false}
           onChange={(e) => stateManager.onQueryChange(e)}
         />
+
+        <Trans i18nKey="test.dont.commit">This should fail CI</Trans>
 
         {hasSelection ? <BrowseActions /> : <BrowseFilters />}
 
