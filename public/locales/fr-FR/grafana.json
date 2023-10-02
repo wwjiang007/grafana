@@ -938,6 +938,11 @@
     "no-tags": "Aucune étiquette trouvée",
     "placeholder": "Filtrer par étiquette"
   },
+  "test": {
+    "dont": {
+      "commit": ""
+    }
+  },
   "time-picker": {
     "absolute": {
       "recent-title": "Périodes absolues récemment utilisées",

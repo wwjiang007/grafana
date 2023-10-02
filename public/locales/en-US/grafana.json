@@ -933,6 +933,11 @@
     "no-tags": "No tags found",
     "placeholder": "Filter by tag"
   },
+  "test": {
+    "dont": {
+      "commit": "This should fail CI"
+    }
+  },
   "time-picker": {
     "absolute": {
       "recent-title": "Recently used absolute ranges",

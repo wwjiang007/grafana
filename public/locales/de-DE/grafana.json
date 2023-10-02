@@ -933,6 +933,11 @@
     "no-tags": "Keine Tags gefunden",
     "placeholder": "Nach Tag filtern"
   },
+  "test": {
+    "dont": {
+      "commit": ""
+    }
+  },
   "time-picker": {
     "absolute": {
       "recent-title": "Kürzlich verwendete absolute Bereiche",

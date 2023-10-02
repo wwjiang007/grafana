@@ -928,6 +928,11 @@
     "no-tags": "未找到标签",
     "placeholder": "按标签筛选"
   },
+  "test": {
+    "dont": {
+      "commit": ""
+    }
+  },
   "time-picker": {
     "absolute": {
       "recent-title": "最近使用的绝对范围",

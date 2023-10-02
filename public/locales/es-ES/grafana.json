@@ -938,6 +938,11 @@
     "no-tags": "No se ha encontrado ninguna etiqueta",
     "placeholder": "Filtrar por etiqueta"
   },
+  "test": {
+    "dont": {
+      "commit": ""
+    }
+  },
   "time-picker": {
     "absolute": {
       "recent-title": "Intervalos absolutos utilizados recientemente",
