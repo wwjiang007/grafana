@@ -935,7 +935,7 @@
   },
   "test": {
     "dont": {
-      "commit": "This should fail CI"
+      "commit": "This should fail CI. Updating the phrase without psuedo"
     }
   },
   "time-picker": {
